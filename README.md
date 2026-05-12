@@ -196,22 +196,22 @@ sjinn video generate [options]
 
 | Model | Notes |
 | --- | --- |
-| `gpt-image-2` | Default image model. Supports `auto`, `1:1`, `16:9`, `9:16`, `3:2`, `2:3`. |
-| `nano-banana` | Supports image references and broad aspect ratios. |
-| `nano-banana-pro` | Supports image references and `1K` or `2K` resolution. |
-| `nano-banana-2` | Supports image references and `1K`, `2K`, or `4K` resolution. |
-| `seedream` | Supports image references and `16:9`, `9:16`, `1:1`, `4:3`, `3:4`. |
-| `seedream-v4` | Supports image references and `16:9`, `9:16`, `1:1`, `4:3`, `3:2`, `2:3`, `3:4`. |
+| `gpt-image-2` | Default image model. Supports `--image`; `--aspect` `auto`, `1:1`, `16:9`, `9:16`, `3:2`, `2:3`. |
+| `nano-banana` | Supports `--image`; `--aspect` `auto`, `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `9:21`, `21:9`, `2:3`, `3:2`. |
+| `nano-banana-pro` | Supports `--image`; `--aspect` same as `nano-banana`; `--resolution` `1K`, `2K`. |
+| `nano-banana-2` | Supports `--image`; `--aspect` same as `nano-banana`; `--resolution` `1K`, `2K`, `4K`. |
+| `seedream` | Supports `--image`; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:2`, `2:3`, `3:4`. |
+| `seedream-v4` | Supports `--image`; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:2`, `2:3`, `3:4`. |
 
 ### Video Models
 
 | Model | Notes |
 | --- | --- |
-| `veo3` | Default video model. Supports text-to-video and image-to-video with `16:9` or `9:16`. |
-| `sora2` | Supports text-to-video and image-to-video, `std` or `pro` mode, and 4, 8, or 12 second durations. |
-| `grok` | Supports text-to-video and image-to-video with 3 to 15 second durations. |
-| `kling3` | Supports text-to-video and image-to-video, `standard` or `pro` mode, end frames, and multi-shot mode. |
-| `seedance` | Supports text-to-video and reference media URLs, `fast` or `pro` mode, and `480p`, `720p`, or `1080p`. |
+| `veo3` | Default video model. Supports `--image`; `--aspect` `16:9`, `9:16`; `--end-image` for image-to-video. |
+| `sora2` | Supports `--image`; `--aspect` `16:9`, `9:16`; `--duration` `4`, `8`, `12`; `--mode` `std`, `pro`. |
+| `grok` | Supports `--image`; `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds. |
+| `kling3` | Supports `--image`; text-to-video `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds; `--mode` `standard`, `pro`; `--multi-shot` `true`, `false`; `--end-image` for image-to-video. |
+| `seedance2` | Supports `--image`, `--media-urls` up to 9 items; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:4`; `--duration` 4-15 seconds; `--mode` `pro`, `fast`; `--resolution` `480p`, `720p`, `1080p`. |
 
 ## Updating
 
