@@ -181,9 +181,11 @@ sjinn video generate [options]
 | `--image <path-or-url>` | Input image for image-to-video. |
 | `--duration <seconds>` | Video duration in seconds, where supported. |
 | `--aspect <ratio>` | Aspect ratio, such as `16:9`, `9:16`, or `1:1`. |
-| `--mode <mode>` | Quality mode, such as `std`, `pro`, `fast`, or `standard`, where supported. |
+| `--mode <mode>` | Quality mode, such as `standard`, `pro`, or `fast`, where supported. |
 | `--resolution <res>` | Output resolution, such as `480p`, `720p`, or `1080p`, where supported. |
 | `--end-image <path-or-url>` | End frame image, where supported. |
+| `--image-urls <urls>` | Comma-separated reference image URLs, where supported. |
+| `--video-urls <urls>` | Comma-separated reference video URLs, where supported. |
 | `--media-urls <urls>` | Comma-separated reference media URLs, where supported. |
 | `--multi-shot <bool>` | Multi-shot mode, where supported. |
 | `--async` | Return the task ID without waiting. |
@@ -208,7 +210,7 @@ sjinn video generate [options]
 | Model | Notes |
 | --- | --- |
 | `veo3` | Default video model. Supports `--image`; `--aspect` `16:9`, `9:16`; `--end-image` for image-to-video. |
-| `sora2` | Supports `--image`; `--aspect` `16:9`, `9:16`; `--duration` `4`, `8`, `12`; `--mode` `std`, `pro`. |
+| `gemini-omni-video` | Supports `--image-urls` up to 7 reference images, `--video-urls` optional reference video (at most 1); `--aspect` `16:9`, `9:16`; `--duration` `4`, `6`, `8`, `10` seconds. |
 | `grok` | Supports `--image`; `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds. |
 | `kling3` | Supports `--image`; text-to-video `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds; `--mode` `standard`, `pro`; `--multi-shot` `true`, `false`; `--end-image` for image-to-video. |
 | `seedance2` | Supports `--image`, `--media-urls` up to 9 items; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:4`; `--duration` 4-15 seconds; `--mode` `pro`, `fast`; `--resolution` `480p`, `720p`, `1080p`. |
