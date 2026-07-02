@@ -55,7 +55,7 @@ sjinn status <task_id>
 sjinn image generate \
   --prompt "a studio portrait with soft rim lighting" \
   --model gpt-image-2 \
-  --aspect 1:1
+  --aspect-ratio 1:1
 ```
 
 ### Image-Guided Generation
@@ -63,7 +63,7 @@ sjinn image generate \
 ```bash
 sjinn image generate \
   --prompt "turn this sketch into a polished product render" \
-  --image ./sketch.png \
+  --image-urls ./sketch.png \
   --model nano-banana-pro \
   --resolution 2K
 ```
@@ -73,7 +73,7 @@ Use comma-separated values for multiple reference images:
 ```bash
 sjinn image generate \
   --prompt "combine these references into one cohesive fashion campaign image" \
-  --image ./pose.png,./fabric.png,https://example.com/mood.jpg
+  --image-urls ./pose.png,./fabric.png,https://example.com/mood.jpg
 ```
 
 ### Text to Video
@@ -82,7 +82,7 @@ sjinn image generate \
 sjinn video generate \
   --prompt "a luxury watch rotating on black marble" \
   --model veo3 \
-  --aspect 16:9
+  --aspect-ratio 16:9
 ```
 
 ### Image to Video
@@ -90,7 +90,7 @@ sjinn video generate \
 ```bash
 sjinn video generate \
   --prompt "animate this character with subtle camera movement" \
-  --image ./character.png \
+  --start-frame-url ./character.png \
   --model kling3 \
   --duration 5
 ```
@@ -161,8 +161,8 @@ sjinn image generate [options]
 | --- | --- |
 | `--prompt <text>` | Image description. |
 | `--model <name>` | Image model. Defaults to `gpt-image-2`. |
-| `--image <paths-or-urls>` | Comma-separated local paths or URLs for reference images. |
-| `--aspect <ratio>` | Aspect ratio, such as `1:1`, `16:9`, or `9:16`. |
+| `--image-urls <paths-or-urls>` | Comma-separated local paths or URLs for reference images. |
+| `--aspect-ratio <ratio>` | Aspect ratio, such as `1:1`, `16:9`, or `9:16`. |
 | `--resolution <res>` | Resolution, such as `1K`, `2K`, or `4K`, where supported. |
 | `--async` | Return the task ID without waiting. |
 | `--download [path]` | Download the result to a local file. |
@@ -178,15 +178,15 @@ sjinn video generate [options]
 | --- | --- |
 | `--prompt <text>` | Video description. |
 | `--model <name>` | Video model. Defaults to `veo3`. |
-| `--image <path-or-url>` | Input image for image-to-video. |
+| `--image-urls <paths-or-urls>` | Comma-separated reference image paths or URLs, where supported. |
+| `--video-urls <paths-or-urls>` | Comma-separated reference video paths or URLs, where supported. |
+| `--audio-urls <paths-or-urls>` | Comma-separated reference audio paths or URLs, where supported. |
+| `--start-frame-url <path-or-url>` | Start frame image for image-to-video, where supported. |
+| `--end-frame-url <path-or-url>` | End frame image, where supported. |
 | `--duration <seconds>` | Video duration in seconds, where supported. |
-| `--aspect <ratio>` | Aspect ratio, such as `16:9`, `9:16`, or `1:1`. |
+| `--aspect-ratio <ratio>` | Aspect ratio, such as `16:9`, `9:16`, or `1:1`. |
 | `--mode <mode>` | Quality mode, such as `standard`, `pro`, or `fast`, where supported. |
 | `--resolution <res>` | Output resolution, such as `480p`, `720p`, or `1080p`, where supported. |
-| `--end-image <path-or-url>` | End frame image, where supported. |
-| `--image-urls <urls>` | Comma-separated reference image URLs, where supported. |
-| `--video-urls <urls>` | Comma-separated reference video URLs, where supported. |
-| `--media-urls <urls>` | Comma-separated reference media URLs, where supported. |
 | `--multi-shot <bool>` | Multi-shot mode, where supported. |
 | `--async` | Return the task ID without waiting. |
 | `--download [path]` | Download the result to a local file. |
@@ -198,22 +198,22 @@ sjinn video generate [options]
 
 | Model | Notes |
 | --- | --- |
-| `gpt-image-2` | Default image model. Supports `--image`; `--aspect` `auto`, `1:1`, `16:9`, `9:16`, `3:2`, `2:3`. |
-| `nano-banana` | Supports `--image`; `--aspect` `auto`, `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `9:21`, `21:9`, `2:3`, `3:2`. |
-| `nano-banana-pro` | Supports `--image`; `--aspect` same as `nano-banana`; `--resolution` `1K`, `2K`. |
-| `nano-banana-2` | Supports `--image`; `--aspect` same as `nano-banana`; `--resolution` `1K`, `2K`, `4K`. |
-| `seedream` | Supports `--image`; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:2`, `2:3`, `3:4`. |
-| `seedream-v4` | Supports `--image`; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:2`, `2:3`, `3:4`. |
+| `gpt-image-2` | Default image model. Supports `--image-urls`; `--aspect-ratio` `auto`, `1:1`, `16:9`, `9:16`, `3:2`, `2:3`. |
+| `nano-banana` | Supports `--image-urls`; `--aspect-ratio` `auto`, `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `9:21`, `21:9`, `2:3`, `3:2`. |
+| `nano-banana-pro` | Supports `--image-urls`; `--aspect-ratio` same as `nano-banana`; `--resolution` `1K`, `2K`. |
+| `nano-banana-2` | Supports `--image-urls`; `--aspect-ratio` same as `nano-banana`; `--resolution` `1K`, `2K`, `4K`. |
+| `seedream` | Supports `--image-urls`; `--aspect-ratio` `16:9`, `9:16`, `1:1`, `4:3`, `3:2`, `2:3`, `3:4`. |
+| `seedream-v4` | Supports `--image-urls`; `--aspect-ratio` `16:9`, `9:16`, `1:1`, `4:3`, `3:2`, `2:3`, `3:4`. |
 
 ### Video Models
 
 | Model | Notes |
 | --- | --- |
-| `veo3` | Default video model. Supports `--image`; `--aspect` `16:9`, `9:16`; `--end-image` for image-to-video. |
-| `gemini-omni-video` | Supports `--image-urls` up to 7 reference images, `--video-urls` optional reference video (at most 1); `--aspect` `16:9`, `9:16`; `--duration` `4`, `6`, `8`, `10` seconds. |
-| `grok` | Supports `--image`; `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds. |
-| `kling3` | Supports `--image`; text-to-video `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds; `--mode` `standard`, `pro`; `--multi-shot` `true`, `false`; `--end-image` for image-to-video. |
-| `seedance2` | Supports `--image`, `--media-urls` up to 9 items; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:4`; `--duration` 4-15 seconds; `--mode` `pro`, `fast`; `--resolution` `480p`, `720p`, `1080p`. |
+| `veo3` | Default video model. Supports `--start-frame-url`, `--end-frame-url`; `--aspect-ratio` `16:9`, `9:16`. |
+| `gemini-omni-video` | Supports `--image-urls` up to 7 reference images, `--video-urls` optional reference video (at most 1); `--aspect-ratio` `16:9`, `9:16`; `--duration` `4`, `6`, `8`, `10` seconds. |
+| `grok` | Supports `--start-frame-url`; `--aspect-ratio` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds. |
+| `kling3` | Supports `--start-frame-url`, `--end-frame-url`; text-to-video `--aspect-ratio` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds; `--mode` `standard`, `pro`; `--multi-shot` `true`, `false`. |
+| `seedance2` | Supports `--image-urls` up to 9, `--video-urls` up to 3, `--audio-urls` up to 3; `--aspect-ratio` `16:9`, `9:16`, `1:1`, `4:3`, `3:4`; `--duration` 4-15 seconds; `--mode` `pro`, `fast`; `--resolution` `480p`, `720p`, `1080p`. Seedance 2.0 does not expose first/last frame generation in the CLI. |
 
 ## Updating
 
