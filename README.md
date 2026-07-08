@@ -4,9 +4,9 @@
 [![GitHub release](https://img.shields.io/github/v/release/sjinn-ai/cli)](https://github.com/sjinn-ai/cli/releases)
 [![License](https://img.shields.io/badge/license-SJinn%20CLI-blue)](./LICENSE)
 
-Generate images and videos from your terminal with [SJinn AI](https://sjinn.ai).
+Generate images, videos, and audio from your terminal with [SJinn AI](https://sjinn.ai).
 
-The CLI supports text-to-image, image-guided generation, text-to-video, image-to-video, async jobs, local downloads, and JSON output for automation.
+The CLI supports text-to-image, image-guided generation, text-to-video, image-to-video, text-to-audio, async jobs, local downloads, and JSON output for automation.
 
 ## Install
 
@@ -39,6 +39,12 @@ Generate a video:
 
 ```bash
 sjinn video generate --prompt "a slow dolly shot through a neon city street at night"
+```
+
+Generate audio:
+
+```bash
+sjinn audio generate --prompt "a short upbeat intro sound"
 ```
 
 Query an async task:
@@ -95,6 +101,32 @@ sjinn video generate \
   --duration 5
 ```
 
+### Text to Audio
+
+```bash
+sjinn audio generate \
+  --prompt "a calm female voice reading a bedtime story" \
+  --model seed-audio-1-0
+```
+
+Use reference audio with Seed Audio 1.0 prompt citations:
+
+```bash
+sjinn audio generate \
+  --prompt "narrate in the style of @Audio1 with the energy of @Audio2" \
+  --audio-urls ./ref-a.mp3,./ref-b.wav \
+  --model seed-audio-1-0
+```
+
+Use a reference image:
+
+```bash
+sjinn audio generate \
+  --prompt "background music matching the mood of this scene" \
+  --image-urls ./scene.png \
+  --model seed-audio-1-0
+```
+
 ### Async Jobs
 
 Return immediately with a task ID:
@@ -116,6 +148,10 @@ sjinn image generate \
 sjinn video generate \
   --prompt "a smooth camera pass over a futuristic workspace" \
   --download ./workspace.mp4
+
+sjinn audio generate \
+  --prompt "a short upbeat jingle" \
+  --download ./jingle.mp3
 ```
 
 ### JSON Output
@@ -138,6 +174,7 @@ sjinn video generate \
 | `sjinn auth logout` | Sign out and clear stored credentials. |
 | `sjinn image generate` | Generate an image from a prompt and optional reference images. |
 | `sjinn video generate` | Generate a video from a prompt and optional input media. |
+| `sjinn audio generate` | Generate audio from a prompt and optional reference media. |
 | `sjinn status <task_id>` | Query task status. |
 
 Run any command with `--help` for the latest options:
@@ -147,6 +184,7 @@ sjinn --help
 sjinn auth --help
 sjinn image generate --help
 sjinn video generate --help
+sjinn audio generate --help
 ```
 
 `sjinn compose` is reserved for upcoming media composition features.
@@ -192,6 +230,22 @@ sjinn video generate [options]
 | `--download [path]` | Download the result to a local file. |
 | `--json` | Print machine-readable JSON. |
 
+## Audio Options
+
+```bash
+sjinn audio generate [options]
+```
+
+| Option | Description |
+| --- | --- |
+| `--prompt <text>` | Audio description. |
+| `--model <name>` | Audio model. Defaults to `seed-audio-1-0`. |
+| `--audio-urls <urls>` | Comma-separated reference audio paths or URLs, where supported. |
+| `--image-urls <urls>` | Reference image path or URL, where supported. |
+| `--async` | Return the task ID without waiting. |
+| `--download [path]` | Download the result to a local file. |
+| `--json` | Print machine-readable JSON. |
+
 ## Models
 
 ### Image Models
@@ -214,6 +268,14 @@ sjinn video generate [options]
 | `grok` | Supports `--image`; `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds. |
 | `kling3` | Supports `--image`; text-to-video `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds; `--mode` `standard`, `pro`; `--multi-shot` `true`, `false`; `--end-image` for image-to-video. |
 | `seedance2` | Supports `--image`, `--media-urls` up to 9 items; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:4`; `--duration` 4-15 seconds; `--mode` `pro`, `fast`; `--resolution` `480p`, `720p`, `1080p`. |
+
+### Audio Models
+
+| Model | Notes |
+| --- | --- |
+| `seed-audio-1-0` | Default audio model. Supports `--audio-urls` up to 3 reference audio paths or URLs, cited in the prompt as `@Audio1`, `@Audio2`, and `@Audio3`; supports `--image-urls` for one reference image. `--audio-urls` and `--image-urls` are mutually exclusive. |
+
+Seed Audio 1.0 local reference audio files support `.mp3`, `.m4a`, and `.wav`. Local reference image files support `.jpg`, `.jpeg`, `.png`, and `.webp`.
 
 ## Updating
 
