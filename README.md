@@ -175,6 +175,7 @@ sjinn video generate \
 | `sjinn image generate` | Generate an image from a prompt and optional reference images. |
 | `sjinn video generate` | Generate a video from a prompt and optional input media. |
 | `sjinn audio generate` | Generate audio from a prompt and optional reference media. |
+| `sjinn compose` | Concatenate multiple videos in order. |
 | `sjinn status <task_id>` | Query task status. |
 
 Run any command with `--help` for the latest options:
@@ -185,9 +186,16 @@ sjinn auth --help
 sjinn image generate --help
 sjinn video generate --help
 sjinn audio generate --help
+sjinn compose --help
 ```
 
-`sjinn compose` is reserved for upcoming media composition features.
+## Video Composition
+
+```bash
+sjinn compose --video-urls "./intro.mp4,./outro.mov" --json
+```
+
+Provide at least 2 videos in playback order. Local files support `.mp4` and `.mov`; HTTPS URLs are passed through. Separate audio, voiceover, background music, and transitions are not supported.
 
 ## Image Options
 
