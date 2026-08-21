@@ -4,9 +4,7 @@
 [![GitHub release](https://img.shields.io/github/v/release/sjinn-ai/cli)](https://github.com/sjinn-ai/cli/releases)
 [![License](https://img.shields.io/badge/license-SJinn%20CLI-blue)](./LICENSE)
 
-Generate images, videos, and audio from your terminal with [SJinn AI](https://sjinn.ai).
-
-The CLI supports text-to-image, image-guided generation, text-to-video, image-to-video, text-to-audio, async jobs, local downloads, and JSON output for automation.
+Generate images, videos, and audio from your terminal with [SJinn AI](https://sjinn.ai). The CLI supports reference media, async jobs, local downloads, JSON output, and video composition.
 
 ## Install
 
@@ -22,289 +20,145 @@ Requirements:
 
 ## Quickstart
 
-Sign in:
+Authenticate in a browser, or save an API token directly:
 
 ```bash
 sjinn auth login
+sjinn auth login --token <your-token>
 sjinn auth whoami
 ```
 
-Generate an image:
+For automation, provide the token through `SJINN_TOKEN`:
+
+```bash
+SJINN_TOKEN=<your-token> sjinn image generate --prompt "a cat in space"
+```
+
+Generate media:
 
 ```bash
 sjinn image generate --prompt "a cinematic product shot of a glass perfume bottle"
-```
-
-Generate a video:
-
-```bash
 sjinn video generate --prompt "a slow dolly shot through a neon city street at night"
-```
-
-Generate audio:
-
-```bash
 sjinn audio generate --prompt "a short upbeat intro sound"
 ```
 
-Query an async task:
-
-```bash
-sjinn status <task_id>
-```
-
-## Examples
-
-### Text to Image
-
-```bash
-sjinn image generate \
-  --prompt "a studio portrait with soft rim lighting" \
-  --model gpt-image-2 \
-  --aspect 1:1
-```
-
-### Image-Guided Generation
-
-```bash
-sjinn image generate \
-  --prompt "turn this sketch into a polished product render" \
-  --image ./sketch.png \
-  --model nano-banana-pro \
-  --resolution 2K
-```
-
-Use comma-separated values for multiple reference images:
-
-```bash
-sjinn image generate \
-  --prompt "combine these references into one cohesive fashion campaign image" \
-  --image ./pose.png,./fabric.png,https://example.com/mood.jpg
-```
-
-### Text to Video
-
-```bash
-sjinn video generate \
-  --prompt "a luxury watch rotating on black marble" \
-  --model veo3 \
-  --aspect 16:9
-```
-
-### Image to Video
-
-```bash
-sjinn video generate \
-  --prompt "animate this character with subtle camera movement" \
-  --image ./character.png \
-  --model kling3 \
-  --duration 5
-```
-
-### Text to Audio
-
-```bash
-sjinn audio generate \
-  --prompt "a calm female voice reading a bedtime story" \
-  --model seed-audio-1-0
-```
-
-Use reference audio with Seed Audio 1.0 prompt citations:
-
-```bash
-sjinn audio generate \
-  --prompt "narrate in the style of @Audio1 with the energy of @Audio2" \
-  --audio-urls ./ref-a.mp3,./ref-b.wav \
-  --model seed-audio-1-0
-```
-
-Use a reference image:
-
-```bash
-sjinn audio generate \
-  --prompt "background music matching the mood of this scene" \
-  --image-urls ./scene.png \
-  --model seed-audio-1-0
-```
-
-### Async Jobs
-
-Return immediately with a task ID:
-
-```bash
-sjinn image generate --prompt "a surreal editorial poster" --async
-sjinn status <task_id>
-```
-
-### Download Results
-
-Save the completed result locally:
-
-```bash
-sjinn image generate \
-  --prompt "a clean hero image for a design studio" \
-  --download ./hero.png
-
-sjinn video generate \
-  --prompt "a smooth camera pass over a futuristic workspace" \
-  --download ./workspace.mp4
-
-sjinn audio generate \
-  --prompt "a short upbeat jingle" \
-  --download ./jingle.mp3
-```
-
-### JSON Output
-
-Use JSON output for automation:
-
-```bash
-sjinn video generate \
-  --prompt "a product demo shot on a white background" \
-  --async \
-  --json
-```
+Use `--async` to return a task ID immediately, then query it with `sjinn status <task_id>`. Add `--json` for machine-readable output, or `--download [path]` to save a completed result locally.
 
 ## Commands
 
 | Command | Description |
 | --- | --- |
-| `sjinn auth login` | Sign in to SJinn. |
-| `sjinn auth whoami` | Show the current authenticated user. |
-| `sjinn auth logout` | Sign out and clear stored credentials. |
+| `sjinn auth login [--token <token>]` | Authenticate in a browser or save an API token. |
+| `sjinn auth whoami` | Verify the current credentials and show the API endpoint. |
+| `sjinn auth logout` | Clear stored credentials. |
 | `sjinn image generate` | Generate an image from a prompt and optional reference images. |
 | `sjinn video generate` | Generate a video from a prompt and optional input media. |
 | `sjinn audio generate` | Generate audio from a prompt and optional reference media. |
-| `sjinn compose` | Concatenate multiple videos in order. |
+| `sjinn compose` | Concatenate videos in order. |
 | `sjinn status <task_id>` | Query task status. |
 
-Run any command with `--help` for the latest options:
+Run `sjinn --help` or any command with `--help` for the installed CLI's option help.
+
+## Common Options
+
+All generation commands require `--prompt <text>` and support `--model <name>`, `--async`, `--download [path]`, and `--json`.
+
+| Command | Additional options |
+| --- | --- |
+| `image generate` | `--image <paths-or-urls>`, `--aspect <ratio>`, `--resolution <res>` |
+| `video generate` | `--image <path-or-url>`, `--duration <seconds>`, `--aspect <ratio>`, `--mode <mode>`, `--resolution <res>`, `--end-image <path-or-url>`, `--image-urls <items>`, `--video-urls <items>`, `--media-urls <items>`, `--multi-shot <bool>` |
+| `audio generate` | `--audio-urls <items>`, `--image-urls <item>` |
+| `compose` | `--video-urls <paths-or-urls>`, `--async`, `--download [path]`, `--json` |
+
+### Examples
 
 ```bash
-sjinn --help
-sjinn auth --help
-sjinn image generate --help
-sjinn video generate --help
-sjinn audio generate --help
-sjinn compose --help
+# Image with local or HTTPS reference images
+sjinn image generate --prompt "polished product render" --image ./sketch.png,https://example.com/mood.jpg --model nano-banana-pro --resolution 2K
+
+# Image-to-video
+sjinn video generate --prompt "animate this character" --image ./character.png --model kling3 --duration 5
+
+# Gemini Omni Video references
+sjinn video generate --prompt "two characters in a lab" --model gemini-omni-video --image-urls ./a.png,./b.png --video-urls ./reference.mov --duration 6
+
+# Seedance 2.0 multi-reference video
+sjinn video generate --prompt "two characters in a lab" --model seedance2 --media-urls ./character-a.png,./character-b.png,./lab.mp4 --duration 5 --json
+
+# Seedance 2.5 multi-reference video
+sjinn video generate --prompt "a concert teaser" --model seedance2.5 --image-urls ./artist.png,./stage.png --video-urls ./movement.mp4 --audio-urls ./track.wav --aspect 16:9 --duration 8 --resolution 1080p
+
+# Seed Audio 1.0 reference audio
+sjinn audio generate --prompt "narrate in the style of @Audio1" --audio-urls ./ref-a.mp3 --model seed-audio-1-0
+
+# Compose at least two videos in playback order
+sjinn compose --video-urls "./intro.mp4,./outro.mov" --download ./combined.mp4
 ```
 
-## Video Composition
+## Models and Limits
 
-```bash
-sjinn compose --video-urls "./intro.mp4,./outro.mov" --json
-```
+### Image models
 
-Provide at least 2 videos in playback order. Local files support `.mp4` and `.mov`; HTTPS URLs are passed through. Separate audio, voiceover, background music, and transitions are not supported.
-
-## Image Options
-
-```bash
-sjinn image generate [options]
-```
-
-| Option | Description |
+| Model | Supported parameters |
 | --- | --- |
-| `--prompt <text>` | Image description. |
-| `--model <name>` | Image model. Defaults to `gpt-image-2`. |
-| `--image <paths-or-urls>` | Comma-separated local paths or URLs for reference images. |
-| `--aspect <ratio>` | Aspect ratio, such as `1:1`, `16:9`, or `9:16`. |
-| `--resolution <res>` | Resolution, such as `1K`, `2K`, or `4K`, where supported. |
-| `--async` | Return the task ID without waiting. |
-| `--download [path]` | Download the result to a local file. |
-| `--json` | Print machine-readable JSON. |
+| `gpt-image-2` (default) | `--image`; `--aspect` `auto`, `1:1`, `16:9`, `9:16`, `3:2`, `2:3` |
+| `nano-banana` | `--image`; `--aspect` `auto`, `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `9:21`, `21:9`, `2:3`, `3:2` |
+| `nano-banana-pro` | `nano-banana` aspects; `--resolution` `1K`, `2K` |
+| `nano-banana-2` | `nano-banana` aspects; `--resolution` `1K`, `2K`, `4K` |
+| `seedream` | `--image`; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:2`, `2:3`, `3:4` |
+| `seedream-v4` | `--image`; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:2`, `2:3`, `3:4` |
 
-## Video Options
+### Video models
 
-```bash
-sjinn video generate [options]
-```
-
-| Option | Description |
+| Model | Supported parameters |
 | --- | --- |
-| `--prompt <text>` | Video description. |
-| `--model <name>` | Video model. Defaults to `veo3`. |
-| `--image <path-or-url>` | Input image for image-to-video. |
-| `--duration <seconds>` | Video duration in seconds, where supported. |
-| `--aspect <ratio>` | Aspect ratio, such as `16:9`, `9:16`, or `1:1`. |
-| `--mode <mode>` | Quality mode, such as `standard`, `pro`, or `fast`, where supported. |
-| `--resolution <res>` | Output resolution, such as `480p`, `720p`, or `1080p`, where supported. |
-| `--end-image <path-or-url>` | End frame image, where supported. |
-| `--image-urls <urls>` | Comma-separated reference image URLs, where supported. |
-| `--video-urls <urls>` | Comma-separated reference video URLs, where supported. |
-| `--media-urls <urls>` | Comma-separated reference media URLs, where supported. |
-| `--multi-shot <bool>` | Multi-shot mode, where supported. |
-| `--async` | Return the task ID without waiting. |
-| `--download [path]` | Download the result to a local file. |
-| `--json` | Print machine-readable JSON. |
+| `veo3` (default) | `--image`; `--aspect` `16:9`, `9:16`; `--end-image` for image-to-video. |
+| `gemini-omni-video` | `--image-urls` up to 7 reference images, `--video-urls` optional reference video (at most 1); `--aspect` `16:9`, `9:16`; `--duration` `4`, `6`, `8`, `10` seconds. |
+| `grok` | `--image`; `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds. |
+| `kling3` | `--image`; text-to-video `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds; `--mode` `standard`, `pro`; `--multi-shot` `true`, `false`; `--end-image` for image-to-video. |
+| `seedance2` | `--image`, `--media-urls` up to 9 total image/video/audio reference paths or URLs; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:4`; `--duration` 4-15 seconds; `--mode` `pro`, `fast`; `--resolution` `480p`, `720p`, `1080p`. |
+| `seedance2.5` | `--image-urls` up to 30 reference images; `--video-urls` up to 10 reference videos; `--audio-urls` up to 10 reference audios; `--aspect` `16:9`, `9:16`, `1:1`, `3:4`, `4:3`, `21:9`; `--duration` 4-30 seconds; `--resolution` `480p`, `720p`, `1080p`. |
 
-## Audio Options
+For Seedance 2.0, `--image` and `--media-urls` are mutually exclusive. Put all multi-reference inputs in `--media-urls`. Local `--media-urls` files are limited to `.jpg`, `.jpeg`, `.png`, `.webp`, `.mp4`, `.mov`, `.mp3`, `.m4a`, and `.wav`.
 
-```bash
-sjinn audio generate [options]
-```
+Seedance 2.5 local reference images support `.jpg`, `.jpeg`, `.png`, and `.webp`; videos support `.mp4` and `.mov`; audios support `.mp3`, `.m4a`, and `.wav`. `--media-urls` is only available for Seedance 2.0.
 
-| Option | Description |
+### Audio model
+
+| Model | Supported parameters |
 | --- | --- |
-| `--prompt <text>` | Audio description. |
-| `--model <name>` | Audio model. Defaults to `seed-audio-1-0`. |
-| `--audio-urls <urls>` | Comma-separated reference audio paths or URLs, where supported. |
-| `--image-urls <urls>` | Reference image path or URL, where supported. |
-| `--async` | Return the task ID without waiting. |
-| `--download [path]` | Download the result to a local file. |
-| `--json` | Print machine-readable JSON. |
+| `seed-audio-1-0` (default) | Up to 3 `--audio-urls` references, cited as `@Audio1`, `@Audio2`, `@Audio3`, or 1 `--image-urls` reference |
 
-## Models
+`--audio-urls` and `--image-urls` are mutually exclusive. Local audio references are limited to `.mp3`, `.m4a`, and `.wav`; local image references are limited to `.jpg`, `.jpeg`, `.png`, and `.webp`.
 
-### Image Models
+## Local Files and Composition
 
-| Model | Notes |
-| --- | --- |
-| `gpt-image-2` | Default image model. Supports `--image`; `--aspect` `auto`, `1:1`, `16:9`, `9:16`, `3:2`, `2:3`. |
-| `nano-banana` | Supports `--image`; `--aspect` `auto`, `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `9:21`, `21:9`, `2:3`, `3:2`. |
-| `nano-banana-pro` | Supports `--image`; `--aspect` same as `nano-banana`; `--resolution` `1K`, `2K`. |
-| `nano-banana-2` | Supports `--image`; `--aspect` same as `nano-banana`; `--resolution` `1K`, `2K`, `4K`. |
-| `seedream` | Supports `--image`; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:2`, `2:3`, `3:4`. |
-| `seedream-v4` | Supports `--image`; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:2`, `2:3`, `3:4`. |
+Local paths are uploaded automatically; HTTPS URLs are passed through. Image generation accepts local upload types `.jpg`, `.jpeg`, `.png`, `.webp`, `.mp4`, `.mov`, `.mp3`, `.m4a`, `.wav`, `.zip`, and `.glb`; model-specific reference options apply the stricter limits above.
 
-### Video Models
+`sjinn compose` is available now. It requires at least two ordered videos. Local compose inputs must be `.mp4` or `.mov`; HTTPS URLs are accepted. Separate audio, voiceover, background music, and transitions are not supported.
 
-| Model | Notes |
-| --- | --- |
-| `veo3` | Default video model. Supports `--image`; `--aspect` `16:9`, `9:16`; `--end-image` for image-to-video. |
-| `gemini-omni-video` | Supports `--image-urls` up to 7 reference images, `--video-urls` optional reference video (at most 1); `--aspect` `16:9`, `9:16`; `--duration` `4`, `6`, `8`, `10` seconds. |
-| `grok` | Supports `--image`; `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds. |
-| `kling3` | Supports `--image`; text-to-video `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds; `--mode` `standard`, `pro`; `--multi-shot` `true`, `false`; `--end-image` for image-to-video. |
-| `seedance2` | Supports `--image`, `--media-urls` up to 9 items; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:4`; `--duration` 4-15 seconds; `--mode` `pro`, `fast`; `--resolution` `480p`, `720p`, `1080p`. |
+## Configuration
 
-### Audio Models
+The config file is `~/.sjinn/config.json`. `SJINN_TOKEN` supplies the API token, and `SJINN_API_BASE` overrides the API base URL (default: `https://sjinn.ai`).
 
-| Model | Notes |
-| --- | --- |
-| `seed-audio-1-0` | Default audio model. Supports `--audio-urls` up to 3 reference audio paths or URLs, cited in the prompt as `@Audio1`, `@Audio2`, and `@Audio3`; supports `--image-urls` for one reference image. `--audio-urls` and `--image-urls` are mutually exclusive. |
+Configuration resolution is: **CLI flags > environment variables > config file > default**. `sjinn auth login --token <token>` saves the token to the config file; `SJINN_TOKEN` takes precedence over that saved token for automated runs.
 
-Seed Audio 1.0 local reference audio files support `.mp3`, `.m4a`, and `.wav`. Local reference image files support `.jpg`, `.jpeg`, `.png`, and `.webp`.
-
-## Updating
+## Updating and Uninstalling
 
 ```bash
 npm install -g @sjinn-build/cli@latest
 sjinn --version
-```
 
-## Uninstall
-
-```bash
 npm uninstall -g @sjinn-build/cli
 ```
 
 ## How Installation Works
 
-The npm package installs a small JavaScript wrapper. During `postinstall`, it downloads the matching prebuilt `sjinn` binary from the public [sjinn-ai/cli GitHub Releases](https://github.com/sjinn-ai/cli/releases) page, verifies its SHA256 checksum, and stores it in the package's `vendor/` directory.
+The npm package installs a small JavaScript wrapper. During `postinstall`, it downloads the matching prebuilt `sjinn` binary from [sjinn-ai/cli GitHub Releases](https://github.com/sjinn-ai/cli/releases), verifies its SHA256 checksum, and stores it in the package's `vendor/` directory.
 
 ## Manual Binary Download
 
-If npm installation cannot reach GitHub Releases, download the matching asset manually from [sjinn-ai/cli releases](https://github.com/sjinn-ai/cli/releases):
+If npm installation cannot reach GitHub Releases, download the matching asset manually from [sjinn-ai/cli releases](https://github.com/sjinn-ai/cli/releases).
 
 | Platform | Asset |
 | --- | --- |
@@ -315,46 +169,40 @@ If npm installation cannot reach GitHub Releases, download the matching asset ma
 | Windows x64 | `sjinn-vX.Y.Z-windows-amd64.zip` |
 | Windows arm64 | `sjinn-vX.Y.Z-windows-arm64.zip` |
 
-Use the matching `sjinn-vX.Y.Z-checksums.txt` file to verify the asset before running it.
+Verify the downloaded asset with the matching `sjinn-vX.Y.Z-checksums.txt` file before running it.
 
-## Troubleshooting
+## Troubleshooting and Support
 
-### Installation Cannot Download the Binary
+### Installation cannot download the binary
 
-Confirm the machine can access:
-
-```text
-https://github.com/sjinn-ai/cli/releases
-```
-
-Then retry:
+Confirm access to `https://github.com/sjinn-ai/cli/releases`, then retry:
 
 ```bash
 npm install -g @sjinn-build/cli@latest
 ```
 
-### Checksum Mismatch
+### Checksum mismatch
 
-Delete the failed installation and reinstall. A checksum mismatch usually means the download was interrupted or corrupted.
+The download may have been interrupted or corrupted. Reinstall the package:
 
 ```bash
 npm uninstall -g @sjinn-build/cli
 npm install -g @sjinn-build/cli@latest
 ```
 
-### Unsupported Platform
+### Authentication or API errors
 
-Prebuilt binaries are published for macOS, Linux, and Windows on x64/arm64. Other platforms are not supported by the npm installer.
+Run `sjinn auth whoami` to check stored credentials. Reauthenticate with `sjinn auth login` or provide a valid `SJINN_TOKEN`. Confirm `SJINN_API_BASE` points to the intended SJinn endpoint if you set it.
 
-## Support
+### Unsupported local file or invalid option
 
-Open an issue in [sjinn-ai/cli issues](https://github.com/sjinn-ai/cli/issues) and include:
+Check the model limits and extension restrictions above, and run the relevant `--help` command. Local extensions are validated before upload; remote HTTP(S) URLs are passed through where the option accepts URLs.
 
-- `sjinn --version`
-- `node --version`
-- Operating system and CPU architecture
-- The command that failed
-- Any error output
+### Unsupported platform
+
+The npm installer publishes binaries only for macOS, Linux, and Windows on x64/arm64.
+
+For help, open an issue in [sjinn-ai/cli issues](https://github.com/sjinn-ai/cli/issues) with `sjinn --version`, `node --version`, your OS and CPU architecture, the failing command, and its error output.
 
 ## License
 
