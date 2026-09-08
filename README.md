@@ -61,12 +61,12 @@ Run `sjinn --help` or any command with `--help` for the installed CLI's option h
 
 ## Common Options
 
-All generation commands require `--prompt <text>` and support `--model <name>`, `--async`, `--download [path]`, and `--json`.
+All generation commands require `--prompt <text>` except `wan3` with reference media, and support `--model <name>`, `--async`, `--download [path]`, and `--json`.
 
 | Command | Additional options |
 | --- | --- |
 | `image generate` | `--image <paths-or-urls>`, `--aspect <ratio>`, `--resolution <res>` |
-| `video generate` | `--image <path-or-url>`, `--duration <seconds>`, `--aspect <ratio>`, `--mode <mode>`, `--resolution <res>`, `--end-image <path-or-url>`, `--image-urls <items>`, `--video-urls <items>`, `--media-urls <items>`, `--multi-shot <bool>` |
+| `video generate` | `--image <path-or-url>`, `--duration <seconds>`, `--aspect <ratio>`, `--mode <mode>`, `--resolution <res>`, `--end-image <path-or-url>`, `--image-urls <items>`, `--video-urls <items>`, `--audio-urls <items>`, `--media-urls <items>`, `--multi-shot <bool>` |
 | `audio generate` | `--audio-urls <items>`, `--image-urls <item>` |
 | `compose` | `--video-urls <paths-or-urls>`, `--async`, `--download [path]`, `--json` |
 
@@ -87,6 +87,12 @@ sjinn video generate --prompt "two characters in a lab" --model seedance2 --medi
 
 # Seedance 2.5 multi-reference video
 sjinn video generate --prompt "a concert teaser" --model seedance2.5 --image-urls ./artist.png,./stage.png --video-urls ./movement.mp4 --audio-urls ./track.wav --aspect 16:9 --duration 8 --resolution 1080p
+
+# MiniMax H3 reference video generation (2K)
+sjinn video generate --model minimax-h3 --prompt "the character turns as the camera moves closer" --image-urls ./character.png --duration 6
+
+# Wan3 accepts references without a prompt
+sjinn video generate --model wan3 --image-urls ./scene.png --duration 10 --resolution 720p --async --json
 
 # Seed Audio 1.0 reference audio
 sjinn audio generate --prompt "narrate in the style of @Audio1" --audio-urls ./ref-a.mp3 --model seed-audio-1-0
@@ -118,6 +124,16 @@ sjinn compose --video-urls "./intro.mp4,./outro.mov" --download ./combined.mp4
 | `kling3` | `--image`; text-to-video `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds; `--mode` `standard`, `pro`; `--multi-shot` `true`, `false`; `--end-image` for image-to-video. |
 | `seedance2` | `--image`, `--media-urls` up to 9 total image/video/audio reference paths or URLs; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:4`; `--duration` 4-15 seconds; `--mode` `pro`, `fast`; `--resolution` `480p`, `720p`, `1080p`. |
 | `seedance2.5` | `--image-urls` up to 30 reference images; `--video-urls` up to 10 reference videos; `--audio-urls` up to 10 reference audios; `--aspect` `16:9`, `9:16`, `1:1`, `3:4`, `4:3`, `21:9`; `--duration` 4-30 seconds; `--resolution` `480p`, `720p`, `1080p`. |
+| `minimax-h3` | Requires `--prompt`; up to 9 `--image-urls`, 3 `--video-urls`, and 3 `--audio-urls`; `--duration` integer 5–15 seconds (default 5); `--aspect` `auto`, `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16` (default `auto`); `--resolution` only `2K` (default). |
+| `wan3` | Requires `--prompt` or at least one reference; prompt at most 20,000 characters; up to 10 `--image-urls`, 5 `--video-urls`, and 5 `--audio-urls`; `--duration` integer 2–30 seconds (default 5); `--aspect` `auto`, `16:9`, `9:16`, `1:1`, `4:3`, `3:4` (default `auto`); `--resolution` `480p`, `720p`, `1080p` (default `480p`). |
+
+For `minimax-h3` and `wan3`, reference lists accept comma-separated local paths or HTTP(S) URLs. Images support `.jpg`, `.jpeg`, `.png`, `.webp`; videos `.mp4`, `.mov`; audio `.mp3`, `.m4a`, `.wav`. Lists are trimmed and empty entries removed. Use `--image-urls` for both single and multiple reference images; order and duplicates are preserved. `--image` is not supported by these two models. Image, video, and audio references may be combined; their limits are counted separately.
+
+Both models reject `--image`, `--mode`, `--multi-shot`, `--end-image`, and `--media-urls`. Parameters and all local reference paths are checked before uploads begin. HTTP(S) references are passed through without inspecting signatures or expiry parameters.
+
+MiniMax H3 reference videos and audios must each be 2–15 seconds; combined reference-video duration and combined reference-audio duration must each be at most 15 seconds. The service checks these limits. Wan3 requires each combined reference-video/audio duration to be at most 15 seconds, and combined reference-video duration plus requested output duration to be at most 30 seconds. The CLI and current SJinn Wan3 handler do not preflight these duration limits; task creation or generation may report downstream errors.
+
+`wan3` can omit `--prompt` when references are provided. All other CLI video models still require a non-empty prompt. These two models follow the public MCP parameter contract, including H3's 2K-only resolution.
 
 For Seedance 2.0, `--image` and `--media-urls` are mutually exclusive. Put all multi-reference inputs in `--media-urls`. Local `--media-urls` files are limited to `.jpg`, `.jpeg`, `.png`, `.webp`, `.mp4`, `.mov`, `.mp3`, `.m4a`, and `.wav`.
 
