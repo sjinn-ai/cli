@@ -76,6 +76,9 @@ All generation commands require `--prompt <text>` except `wan3` with reference m
 # Image with local or HTTPS reference images
 sjinn image generate --prompt "polished product render" --image ./sketch.png,https://example.com/mood.jpg --model nano-banana-pro --resolution 2K
 
+# GPT Image 2.5 reference editing (also supports gpt-image-2.5-sunburst)
+sjinn image generate --model gpt-image-2.5-flare --prompt "keep the product, replace the background with a white studio" --image ./product.png --aspect 3:4 --resolution 2K --json
+
 # Image-to-video
 sjinn video generate --prompt "animate this character" --image ./character.png --model kling3 --duration 5
 
@@ -108,11 +111,17 @@ sjinn compose --video-urls "./intro.mp4,./outro.mov" --download ./combined.mp4
 | Model | Supported parameters |
 | --- | --- |
 | `gpt-image-2` (default) | `--image`; `--aspect` `auto`, `1:1`, `16:9`, `9:16`, `3:2`, `2:3` |
+| `gpt-image-2.5-flare` | Up to 16 `--image` references; `--aspect` `1:1` (default), `3:4`, `9:16`, `4:3`, `16:9`; `--resolution` `1K` (default), `2K`, `4K` |
+| `gpt-image-2.5-sunburst` | Same parameters and limits as `gpt-image-2.5-flare` |
 | `nano-banana` | `--image`; `--aspect` `auto`, `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `9:21`, `21:9`, `2:3`, `3:2` |
 | `nano-banana-pro` | `nano-banana` aspects; `--resolution` `1K`, `2K` |
 | `nano-banana-2` | `nano-banana` aspects; `--resolution` `1K`, `2K`, `4K` |
 | `seedream` | `--image`; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:2`, `2:3`, `3:4` |
 | `seedream-v4` | `--image`; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:2`, `2:3`, `3:4` |
+
+GPT Image 2.5 requires a non-empty trimmed `--prompt` and an explicit full model ID; the CLI default remains `gpt-image-2`. Omit `--image` for text-to-image, or supply reference images with editing instructions. `--aspect auto` is not supported, and resolution values are case-sensitive. Both variants support the existing `--async`, `--download [path]`, and `--json` options; `--async` returns before any result download.
+
+For these two models, `--image` accepts comma-separated local `.jpg`, `.jpeg`, `.png`, `.webp` files and complete HTTP(S) URLs without embedded credentials. Lists are trimmed and empty entries removed; order and duplicates are preserved, with duplicates counted toward the 16-image limit. All parameters and local files are checked before any upload. Remote URLs are passed through without extension, signature, expiry, or availability checks.
 
 ### Video models
 
