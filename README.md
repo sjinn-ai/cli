@@ -130,6 +130,8 @@ For these two models, `--image` accepts comma-separated local `.jpg`, `.jpeg`, `
 | `veo3` (default) | `--image`; `--aspect` `16:9`, `9:16`; `--end-image` for image-to-video. |
 | `gemini-omni-video` | `--image-urls` up to 7 reference images, `--video-urls` optional reference video (at most 1); `--aspect` `16:9`, `9:16`; `--duration` `4`, `6`, `8`, `10` seconds. |
 | `grok` | `--image`; `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds. |
+| `kling4` | Requires `--prompt` (max 8,000 characters); up to 10 `--image-urls` and 5 `--video-urls`; `--duration` integer 3–30 seconds (default 5); `--resolution` `720p` (default) or `1080p`; `--aspect` `16:9` (default), `9:16`, `1:1`, `21:9`, `auto`. |
+| `kling4-frames` | Requires `--image` as the first frame; optional `--end-image`, ordered intermediate `--keyframe-urls`, and `--prompt` (non-empty when provided, max 8,000 characters); same duration/resolution as `kling4`; aspect follows the input image. |
 | `kling3` | `--image`; text-to-video `--aspect` `16:9`, `9:16`, `1:1`; `--duration` 3-15 seconds; `--mode` `standard`, `pro`; `--multi-shot` `true`, `false`; `--end-image` for image-to-video. |
 | `seedance2` | `--image`, `--media-urls` up to 9 total image/video/audio reference paths or URLs; `--aspect` `16:9`, `9:16`, `1:1`, `4:3`, `3:4`; `--duration` 4-15 seconds; `--mode` `pro`, `fast`; `--resolution` `480p`, `720p`, `1080p`. |
 | `seedance2.5` | `--image-urls` up to 30 reference images; `--video-urls` up to 10 reference videos; `--audio-urls` up to 10 reference audios; `--aspect` `16:9`, `9:16`, `1:1`, `3:4`, `4:3`, `21:9`; `--duration` 4-30 seconds; `--resolution` `480p`, `720p`, `1080p`. |
@@ -142,7 +144,18 @@ Both models reject `--image`, `--mode`, `--multi-shot`, `--end-image`, and `--me
 
 MiniMax H3 reference videos and audios must each be 2–15 seconds; combined reference-video duration and combined reference-audio duration must each be at most 15 seconds. The service checks these limits. Wan3 requires each combined reference-video/audio duration to be at most 15 seconds, and combined reference-video duration plus requested output duration to be at most 30 seconds. The CLI and current SJinn Wan3 handler do not preflight these duration limits; task creation or generation may report downstream errors.
 
-`wan3` can omit `--prompt` when references are provided. All other CLI video models still require a non-empty prompt. These two models follow the public MCP parameter contract, including H3's 2K-only resolution.
+`wan3` can omit `--prompt` when references are provided. `kling4-frames` can also omit the prompt; all other CLI video models require a non-empty prompt. MiniMax H3 and Wan3 follow the public MCP parameter contract, including H3's 2K-only resolution.
+
+Kling 4 Omni references use `@image_1` / `@video_1` (also `@Image1` / `@Video1`) with one-based indices matching the ordered reference lists. Reference videos must each be 3–30 seconds and total at most 30 seconds; the service checks duration before charging. References are not fixed frames. Use `kling4-frames` for explicit frame controls: `--keyframe-urls` contains chronological intermediate frames, excluding the first and last. Total frames must not exceed `min(10, duration + 1)`, including the first and optional last frame.
+
+Both Kling 4 models reject `--mode`, `--multi-shot`, `--audio-urls`, and `--media-urls`. Omni also rejects `--image`, `--end-image`, and `--keyframe-urls`; Frames rejects `--aspect`, `--image-urls`, and `--video-urls`. Images accept local `.jpg`/`.jpeg`/`.png`/`.webp` files and videos `.mp4`/`.mov`. Complete HTTP(S) URLs without embedded credentials are passed through, including signed URLs. All parameters and local assets are checked before uploads; order and duplicates are preserved.
+
+```bash
+sjinn video generate --model kling4 --prompt "Animate @image_1" --image-urls ./character.png --duration 8
+sjinn video generate --model kling4-frames --image ./start.png --keyframe-urls ./middle.png --end-image ./end.png --duration 8
+```
+
+Kling 4 supports `--async`, `--json`, and `--download` through the existing task flow. Creation requests are not automatically retried after network or response-decoding failures: the task may already exist, so check task history before submitting again. The server must support the `kling4-omni-video-api` and `kling4-image-to-video-api` un-api handlers before these models can be used.
 
 For Seedance 2.0, `--image` and `--media-urls` are mutually exclusive. Put all multi-reference inputs in `--media-urls`. Local `--media-urls` files are limited to `.jpg`, `.jpeg`, `.png`, `.webp`, `.mp4`, `.mov`, `.mp3`, `.m4a`, and `.wav`.
 
